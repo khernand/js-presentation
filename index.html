@@ -15,6 +15,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/custom.css">
 		<link rel="stylesheet" href="css/theme/black.css" id="theme">
 
 		<!-- Theme used for syntax highlighting of code -->
@@ -41,19 +42,307 @@
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
 				<section>
-					<h1>Reveal.js</h1>
-					<h3>The HTML Presentation Framework</h3>
-					<p>
-						<small>Created by <a href="http://hakim.se">Hakim El Hattab</a> / <a href="http://twitter.com/hakimel">@hakimel</a></small>
-					</p>
+					<section>
+						<h3>Preface: Version Terminology</h3>
+						<table>
+							<tr>
+								<td><span style="color:red">ES6</span></td>
+								<td><span style="color:green">ES2015</span></td>
+							</tr>
+							<tr>
+								<td><span style="color:red">ES7</span></td>
+								<td><span style="color:green">ES2016</span></td>
+							</tr>
+							<tr>
+								<td><span style="color:red">ES8</span></td>
+								<td>
+									<span style="color:green">ES2017</span>
+								</td>
+							</tr>
+							<tr>
+								<td>Proposed Features</td>
+								<td>
+									<span style="color:green">ES.Next</span>
+								</td>
+							</tr>
+						</table>
+
+						<aside class="notes">
+							ECMAScripts is a specification of a scripting language. The specification was made particularly
+							for JavScript, although other languages can be built off the specification (ActionScript). The
+							formal specification body has in the past faced major internal political differences
+							(particularly with the 4th edition which led to a 10 year gap in edition releases). ES is now
+							heavily influenced by large companies like Mozilla, Microsoft, Google, and Netflix and has moved
+							to a commitment of iterative yearly releases. So, versions are encouraged to be referred to by
+							their year tag and not edition tag.
+						</aside>
+					</section>
+
+					<section>
+						<table>
+							<tr>
+								<td>Stage 0:</td>
+								<td>Strawman.</td>
+							</tr>
+							<tr>
+								<td style="white-space:nowrap">Stage 1:</td>
+								<td>Proposal. Committee is devoting time to investigate.</td>
+							</tr>
+							<tr>
+								<td>Stage 2:</td>
+								<td>Draft. Committee expects the feature to be developed.</td>
+							</tr>
+							<tr>
+								<td>Stage 3:</td>
+								<td>Candidate. Feature complete. Awaiting significant usage and external feedback.</td>
+							</tr>
+							<tr>
+								<td>Stage 4:</td>
+								<td>Ready for inclusion. Included in the next standard revision.</td>
+							</tr>
+						</table>
+
+						<aside class="notes">
+							It is important to keep in mind the maturity of features when actively developing in JavScript.
+							By the nature of the language, transpiling has become an important intermediary step. Transpiling
+							can allow you to do some dangerous things when developing a production application so keep
+							these stages in mind. You only want to include stage 4 features in production.
+						</aside>
+					</section>
 				</section>
 
 				<section>
-					<h2>Hello There</h2>
-					<p>
-						reveal.js enables you to create beautiful interactive slide decks using HTML. This presentation will show you examples of what it can do.
-					</p>
+					<section>
+						<h2>ES2015 Features</h2>
+					</section>
+					<section>
+						<h3>Arrow Functions</h3>
+						<pre><code class="hljs" data-trim>
+const values = [1,2,3,4];
+let total;
+
+//ES5
+total = values.reduce(function(a,b) {
+	return a + b;
+}, 0);
+
+//ES2015
+total = values.reduce((a,b) => a + b, 0);
+						</code></pre>
+						<p>Shorter function syntax improve readability. Especially when deeply nested or passed in arguments.</p>
+						<aside class="notes">
+							Arrows are a function shorthand with the added property that they share the same lexical
+							"this" as their surrounding code. this new construct is particularly useful in functional
+							programming, however, it's lexical "this" binding also makes it
+						</aside>
+					</section>
+					<section>
+						<small>Enhanced Object Literals</small>
+						<pre><code class="hljs" data-trim>
+let foo = 'b';
+
+const obj = {
+	// __proto__
+	__proto__: theProtoObj,
+	// Shorthand for 'foo: foo'
+	foo,
+	// Methods
+	toString() {
+	   //Can make Super calls
+	   return 'd' + super.toString();
+	}
+}
+
+						</code></pre>
+						<aside class="notes">
+							Object literals already existed, however, ES2015 brought about several enhancements allowing
+							for directly setting the prototype, reducing redundant decelerations, and declaring functions
+							in line that can even reference super.
+						</aside>
+					</section>
+					<section>
+						<small>Template Strings</small>
+						<pre class="fragment current-visible"><code class="hljs" data-trim>
+let a = 5;
+let b =	10;
+console.log(`Fifteen is ${a + b} and not ${2 * a + b}`);
+// Fifteen is 15 and not 20
+						</code></pre>
+						<pre class="fragment current-visible"><code class="hljs" data-trim>
+const person = 'Mike';
+const age = 28;
+
+function myTag(strings, personExp, ageExp) {
+  let ageStr;
+  if (ageExp > 99){
+    ageStr = 'centenarian';
+  } else {
+    ageStr = 'youngster';
+  }
+  return strings[0] + personExp + strings[1] + ageStr;
+}
+
+var output = myTag`that ${ person } is a ${ age }`;
+
+console.log(output); // that Mike is a youngster
+						</code></pre>
+						<aside class="notes">
+							Adds string interpolation features present in most other scripting languages.
+						</aside>
+					</section>
+					<section>
+						<small>Destructuring</small>
+						<pre class="fragment current-visible"><code class="hljs" data-trim>
+function f() { return [1, 2]; }
+let [a, b] = f();
+
+console.log(a); // 1
+console.log(b); // 2
+						</code></pre>
+						<pre class="fragment current-visible"><code class="hljs" data-trim>
+let metaData = {
+	name: 'Mike Smith',
+	family: {
+		mother: 'Jane Smith',
+		father: 'Harry Smith'
+	}
+}
+
+let {name, family: {mother: mothersName} } = metaData;
+
+console.log(name); // Mike Smith
+console.log(mothersName); // Jane Smith
+						</code></pre>
+					</section>
+					<section>
+						<small>Default</small>
+						</code></pre>
+						<pre><code class="hljs" data-trim>
+function f(x, y=12) {
+  // y is 12 if not passed (or passed as undefined)
+  return x + y;
+}
+f(3) === 15
+						</code></pre>
+						<small>Rest</small>
+						</code></pre>
+						<pre><code class="hljs" data-trim>
+function f(x, ...y) {
+  // y is an Array
+  return x * y.length;
+}
+f(3, "hello", true) === 6
+						</code></pre>
+						<small>Spread</small>
+						</code></pre>
+						<pre><code class="hljs" data-trim>
+function f(x, y, z) {
+  return x + y + z;
+}
+// Pass each elem of array as argument
+f(...[1,2,3]) == 6
+						</code></pre>
+					</section>
 				</section>
+				<section>
+					<section>
+						<h2>ES2016 Features</h2>
+					</section>
+					<section>
+						<h3>Exponential Operator</h3>
+						<pre><code class="hljs" data-trim>
+2**5 === Math.pow(2,5) // true
+						</code></pre>
+						<p class="fragment current-visible">Neat.</p>
+					</section>
+					<section>
+						<h3>Array.prototype.includes</h3>
+						<pre><code class="hljs" data-trim>
+['a','b','c'].includes('a'); // true
+[NaN, 1, 2].includes(NaN); // true
+						</code></pre>
+						<p class="fragment current-visible">Neat.</p>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>ES2017 Features</h2>
+					</section>
+
+					<section>
+						<h3>Shared Memory and Atomics</h3>
+						<ul class="fragment current-visible">
+							<li>New SharedArrayBuffer primitive allows sharing between workers and the main thread</li>
+							<li>New Atomics methods for synchronizing workers</li>
+						</ul>
+						<small class="fragment current-visible">Interesting topic for the future of JavaScript, but, outside the scope of anything we will
+						practically be using now. See for more info: https://hacks.mozilla.org/2016/05/a-taste-of-javascripts-new-parallel-primitives/ </small>
+					</section>
+
+					<section>
+						<h3>Async Functions</h3>
+
+					</section>
+
+				</section>
+
+
+				<section>
+					<section>
+						<h2>Transpiling</h2>
+
+						<aside class="notes">
+							With such crucial features introduced in new ES versions, as well as features that are Stage 4
+							(ready to use) and simply waiting for the next release, you may wonder what needs to be done to
+							begin developing with the latest stable ES feature set in your environment. Enter, transpiling.
+							Transpiling stands for transformation and compiling. It is a tool for converting ES2015+ code
+							into code that works on ES2015 environments. With transpiling, you write your code with the latest
+							language features, and simply introduce a build step which generates a distributable version of
+							your code that is usable in all of your target environments. The tool used in this build step
+							is called Babel.
+						</aside>
+					</section>
+					<section>
+						<small>This ES2017 code:</small>
+						<pre><code class="hljs" data-trim>
+async function foo(promise) {
+  const result = await promise;
+  return result
+}
+						</code></pre>
+						<small>Becomes this ES2015 code when run through Babel:</small>
+
+						<pre><code class="hljs" data-trim>
+let foo = (() => {
+  var _ref = _asyncToGenerator(function* (promise) {
+    const result = yield promise;
+    return result;
+  });
+
+  return function foo(_x) {
+    return _ref.apply(this, arguments);
+  };
+})();
+
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+						</code></pre>
+						<aside class="notes">
+							Notice, babel here is configured to transpile for versions of Node less than 7.6 (before Node
+							used a version of V8 supporting async/await). The current LTS is 6.11. So, if you wanted to use
+							the latest LTS of node and also use latest ES features, you would need either this step or a polyfill
+							for your code to work properly. Babel can be configured to transpile targeting the environment
+							your code is running in. This means that if you were using a later version of Node your code when
+							run through the transpiler would look exactly the same.
+						</aside>
+					</section>
+					<section>
+						<p>Adding Transpiling to Your Application</p>
+
+					</section>
+				</section>
+
+
+
 
 				<!-- Example of nested vertical slides -->
 				<section>
