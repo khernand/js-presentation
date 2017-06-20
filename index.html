@@ -145,12 +145,209 @@ total = values.reduce(function(a,b) {
 //ES2015
 total = values.reduce((a,b) => a + b, 0);
 						</code></pre>
-						<p>Shorter function syntax improve readability. Especially when deeply nested or passed in arguments.</p>
+						<p>Shorter function syntax improves readability. Especially when deeply nested or passed in arguments.</p>
 						<aside class="notes">
 							Arrows are a function shorthand with the added property that they share the same lexical
 							"this" as their surrounding code. this new construct is particularly useful in functional
-							programming, however, it's lexical "this" binding also makes it
+							programming, however, it's lexical "this" binding also adds a nuance that could lead to bugs.
 						</aside>
+					</section>
+					<section>
+						<pre><code class="hljs" data-trim>
+function Person() {
+  /** The Person() constructor defines `this` as an
+	instance of itself. **/
+  this.age = 0;
+
+  setInterval(function growUp() {
+    /** In non-strict mode, the growUp() function defines `this`
+    as the global object, which is different from the `this`
+     defined by the Person() constructor. **/
+    this.age++;
+  }, 1000);
+}
+
+var p = new Person();
+						</code></pre>
+						<pre><code class="hljs" data-trim>
+function Person(){
+  this.age = 0;
+
+  setInterval(() => {
+    this.age++; // |this| properly refers to the person object
+  }, 1000);
+}
+
+var p = new Person();
+						</code></pre>
+					</section>
+					<section>
+						<small>Classes</small>
+						<pre><code style="max-height:100%" class="hljs" data-trim>
+class Rectangle {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+
+  get area() {
+    return this.calcArea();
+  }
+
+  calcArea() {
+    return this.height * this.width;
+  }
+}
+
+const square = new Rectangle(10, 10);
+
+console.log(square.area);
+						</code></pre>
+					</section>
+					<section>
+						<small>Privacy?</small>
+						<pre><code style="max-height:100%" class="hljs" data-trim>
+function calcArea(rectangle) {
+  return rectangle.height * rectangle.width;
+}
+
+class Rectangle {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+
+  get area() {
+    return calcArea(this);
+  }
+}
+
+export default Rectangle;
+						</code></pre>
+					</section>
+					<section>
+						<small>Static methods</small>
+						<pre><code style="max-height:100%" class="hljs" data-trim>
+class Point {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  static distance(a, b) {
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+
+    return Math.hypot(dx, dy);
+  }
+}
+
+const p1 = new Point(5, 5);
+const p2 = new Point(10, 10);
+
+console.log(Point.distance(p1, p2));
+						</code></pre>
+					</section>
+					<section>
+						<small>What is "autoboxing"?</small>
+						<pre><code style="max-height:100%" class="hljs" data-trim>
+class Animal {
+  speak() {
+    return this;
+  }
+  static eat() {
+    return this;
+  }
+}
+
+let obj = new Animal();
+let speak = obj.speak;
+speak(); // undefined
+
+let eat = Animal.eat;
+eat(); // undefined
+						</code></pre>
+					</section>
+					<section>
+						<small>Sub classes</small>
+						<pre><code style="max-height:100%" class="hljs" data-trim>
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+
+  speak() {
+    console.log(this.name + ' makes a noise.');
+  }
+}
+
+class Dog extends Animal {
+  speak() {
+    console.log(this.name + ' barks.');
+  }
+}
+
+var d = new Dog('Mitzie');
+d.speak(); // Mitzie barks.
+						</code></pre>
+					</section>
+					<section>
+						<small>Super</small>
+						<pre><code style="max-height:100%" class="hljs" data-trim>
+class Cat {
+  constructor(name) {
+    this.name = name;
+  }
+
+  speak() {
+    console.log(this.name + ' makes a noise.');
+  }
+}
+
+class Lion extends Cat {
+  speak() {
+    super.speak();
+    console.log(this.name + ' roars.');
+  }
+}
+
+var l = new Lion('Fuzzy');
+l.speak();
+// Fuzzy makes a noise.
+// Fuzzy roars.
+						</code></pre>
+					</section>
+					<section>
+						<small>Classes are really just the same prototypical inheritance JS has always had...</small>
+						<div id="left">
+						<pre><code style="max-height:100%" class="hljs" data-trim>
+class Foo {
+  constructor(bar) {
+    this._bar = bar;
+  }
+
+  getBar() {
+    return this._bar;
+  }
+}
+						</code></pre>
+						</div>
+						<div id="right">
+						<pre><code style="max-height:100%" class="hljs" data-trim>
+var Foo = (function () {
+  function Foo(bar) {
+    this._bar = bar;
+  }
+
+  Foo.prototype.getBar =
+   function () {
+    return this._bar;
+   }
+
+  return Foo;
+})();
+						</code></pre>
+						</div>
 					</section>
 					<section>
 						<small>Enhanced Object Literals</small>
@@ -261,7 +458,7 @@ f(...[1,2,3]) == 6
 					</section>
 					<section>
 						<small>Let: declare variables limited in scope to block they were declared</small>
-						<pre><code class="hljs" data-trim>
+						<pre><code style="max-height:100%" class="hljs" data-trim>
 function varTest() {
   var x = 1;
   if (true) {
@@ -288,21 +485,124 @@ function letTest() {
 					</section>
 					<section>
 						<small>Const: same scoping rules as let, without ability for re-assignment or re-deceleration</small>
-						<pre><code class="hljs" data-trim>
+						<pre><code style="max-height:100%" class="hljs" data-trim>
 const FOO = 5;
 // trying to redeclare a constant throws an error
 FOO = 42;
 // FOO is reserved, this fails
 let FOO = 42;
+
 if(true) {
 	// This is OK (new scope)
 	let FOO = 42;
 }
+
 if(true) {
 	// This is not OK (var is hoisted to global scope)
 	var FOO = 12;
 }
 						</code></pre>
+						<aside class="notes">
+							The const declaration creates a read-only reference to a value. It does not mean the value
+							it holds is immutable, just that the variable identifier cannot be reassigned. For instance,
+							in the case where the content is an object, this means the object's contents
+							(e.g. its parameters) can be altered.
+						</aside>
+					</section>
+					<section>
+						<small>Iterators + For..Of</small>
+						<pre><code style="max-height:100%" class="hljs" data-trim>
+let fibonacci = {
+  [Symbol.iterator]() {
+    let pre = 0, cur = 1;
+    return {
+      next() {
+        [pre, cur] = [cur, pre + cur];
+        return { done: false, value: cur }
+      }
+    }
+  }
+}
+
+for (var n of fibonacci) {
+  // truncate the sequence at 1000
+  if (n > 1000)
+    break;
+  console.log(n);
+}
+						</code></pre>
+					</section>
+					<section>
+						<small>Don't use Iterators + For..Of</small>
+						<p>Use map() / every() / filter() / find() / findIndex() / reduce() / some() /
+							... to iterate over arrays, and Object.keys() / Object.values() / Object.entries() to
+							produce arrays so you can iterate over objects.</p>
+					</section>
+					<section>
+						<small>Full unicode support</small>
+						<pre><code style="max-height:100%" class="hljs js" data-trim>
+// same as ES5.1
+"💩".length == 2
+
+// new RegExp behaviour, opt-in ‘u’
+"💩".match(/./u)[0].length == 2
+
+// new form
+"\u{1F4A9}"=="💩"=="\uD83D\uDCA9"
+
+// new String ops
+"💩".codePointAt(0) == 128169
+						</code></pre>
+					</section>
+					<section>
+						<small>Modules</small>
+						<pre><code style="max-height:100%" class="hljs js" data-trim>
+// lib/math.js
+export function sum(x, y) {
+  return x + y;
+}
+export var pi = 3.141593;
+						</code></pre>
+						<pre><code style="max-height:100%" class="hljs js" data-trim>
+// app.js
+import * as math from "lib/math";
+alert("2π = " + math.sum(math.pi, math.pi));
+						</code></pre>
+						<pre><code style="max-height:100%" class="hljs js" data-trim>
+// otherApp.js
+import {sum, pi} from "lib/math";
+alert("2π = " + sum(pi, pi));
+						</code></pre>
+					</section>
+					<section>
+						<small>Map + Set + WeakMap + WeakSet</small>
+						<pre><code style="max-height:100%" class="hljs js" data-trim>
+// Sets
+var s = new Set();
+s.add("hello").add("goodbye").add("hello");
+s.size === 2;
+s.has("hello") === true;
+
+// Maps
+var m = new Map();
+m.set("hello", 42);
+m.set(s, 34);
+m.get(s) == 34;
+
+// Weak Maps
+var wm = new WeakMap();
+wm.set(s, { extra: 42 });
+wm.size === undefined
+
+// Weak Sets
+var ws = new WeakSet();
+ws.add({ data: 42 });
+// Because the added object has no other references,
+//	it will not be held in the set
+						</code></pre>
+					</section>
+					<section>
+						<h3>Promises</h3>
 						<aside class="notes">
 							The const declaration creates a read-only reference to a value. It does not mean the value
 							it holds is immutable, just that the variable identifier cannot be reassigned. For instance,
@@ -476,7 +776,7 @@ loadImageAsync('one.png')
 					</section>
 					<section>
 						<small>Promise control flow</small>
-						<pre><code style="font-size:15px; line-height: normal" class="hljs" data-trim>
+						<pre><code style="max-height:100%" class="hljs" data-trim>
 function loadImages(urls) {
   const promises = urls.map(loadImageAsync);
   return Promise.all(promises);
@@ -514,7 +814,7 @@ function loadImageAsync(url) {
 					</section>
 					<section>
 						<small>Async Functions</small>
-						<pre><code style="font-size:15px; line-height: normal" class="hljs" data-trim>
+						<pre><code style="max-height:100%" class="hljs" data-trim>
 function loadImages(urls) {
   const promises = urls.map(loadImageAsync);
   return Promise.all(promises);
@@ -597,8 +897,154 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 						</aside>
 					</section>
 					<section>
-						<p>Adding Transpiling to Your Application</p>
+						<small>Adding Transpiling</small>
+						<pre><code style="max-height:100%" class="hljs bash" data-trim>
+npm i -D babel-cli babel-core babel-plugin-module-resolver babel-preset-env nodemon
+npm i -S babel-polyfill
+						</code></pre>
+						<small>Add .babelrc file to root directory</small>
+						<pre><code style="max-height:100%" class="hljs json" data-trim>
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "node": "current"
+      }
+    }]
+  ],
+  "plugins": [
+    ["module-resolver", {
+      "root": ["./src"]
+    }]
+  ]
+}
+						</code></pre>
+					</section>
+					<section>
+						<small>Add this import to your main.js or app.js file (whatever you call the entry point of your server)</small>
+						<pre><code style="max-height:100%" class="hljs js" data-trim>
+import 'babel-polyfill';
+						</code></pre>
+						<small>Add some scripts to your package.json under scripts</small>
+						<pre><code style="max-height:100%" class="hljs json" data-trim>
+    "build": "babel src --out-dir dist",
+    "serve": "node dist/main",
+    "start:babel": "babel-node src/main",
+    "start": "nodemon --watch src --exec npm run start:babel -L",
+						</code></pre>
+						<aside class="notes">
+							The build and serve scripts are used only for getting your app ready in production. build first transpiles all the files in the src directory and outputs them into a directory called dist. Then serve simply runs the transpiled entry point of your application.
+							start:babel is the underlying command that will run your code as you develop. It simply runs the code directly with the babel-node interpreter instead of transpiling into a directory. This is heavy handed and not suitable for serving production code (that is why the build and serve commands exist).
+							The start script wraps start:babel using a service called nodemon. nodemon is a hot reloader which allows you to develop locally and anytime a change happens in your src/ directory, the server will automatically reload expediting the development workflow.
+							With these command in place, developing locally is as simple as pulling the code, running npm install, and then npm start. Deploying the code in Docker would be just as simple requiring only npm install, npm run build, and finally npm run serve.
+						</aside>
+					</section>
+				</section>
+				<section>
+					<ol>
+						<li>ES2015 / ES2016 / ES2017 Features</li>
+						<li>Promises and Async/Await</li>
+						<li>Transpiling</li>
+						<li class="fragment highlight-green" data-fragment-index="1">Common Libraries</li>
+						<li>Linting / Testing</li>
+					</ol>
+				</section>
+				<section>
+					<section>
+						<h3>request-promise</h3>
+						<p>
+Used to make common HTTP call operations
+						</p>
+						<small>https://github.com/request/request-promise</small>
+					</section>
+					<section>
+					<pre><code style="max-height:100%" class="hljs js" data-trim>
+import rp from 'request-promise';
+import config from 'config';
+const catalog = config.get('CimpressOpen.FulfillmentCatalog');
 
+async function getTaxClassifications(sku) {
+  const options = {
+    method: 'GET',
+    uri: `${catalog}v1/fulfillment-catalogs/products/tax-classifications/${sku}`,
+    json: true,
+  };
+  return rp(options);
+}
+
+async function getItemPrices(pricingContext, items) {
+  const options = {
+    method: 'POST',
+    uri: `${catalog}v1/fulfillment-catalogs/prices?PricingContext=${pricingContext}`,
+    json: {
+      Items: items,
+    },
+  };
+  return rp(options);
+}
+export { getItemPrices, getTaxClassifications };
+						</code></pre>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h3>Lodash</h3>
+						<p>
+							Iterating arrays, objects, & strings
+							Manipulating & testing values
+							Creating composite functions
+						</p>
+						<small>https://lodash.com/docs/4.17.4</small>
+					</section>
+					<section>
+					Iteratee shorthand, null checking, works on arrays and objects
+					<pre><code style="max-height:100%" class="hljs js" data-trim>
+					let a = [{id:1}, {id:2}, {id:3}, {} ];
+					_.map(a, 'id');
+					</code></pre>
+					<small>Compare to:</small>
+					<pre><code style="max-height:100%" class="hljs js" data-trim>
+					let a = [{id:1}, {id:2}, {id:3}, {} ];
+					a.map(o=>(o!=null?o.id:undefined));
+					</code></pre>
+					</section>
+					<section>
+						Many functions that do not exist natively
+					<pre><code style="max-height:100%" class="hljs js" data-trim>
+var object = { 'a': [{ 'b': { 'c': 3 } }] };
+
+_.get(object, 'a[0].b.c');
+					</code></pre>
+						<small>Compare to:</small>
+					<pre><code style="max-height:100%" class="hljs js" data-trim>
+var object = { 'a': [{ 'b': { 'c': 3 } }] };
+
+if (object && object.a && object.a[0] && object.a[0].b ) {
+   return object.a[0].b.c
+}
+					</code></pre>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h3>Belt</h3>
+						<p>
+							A Cimpress library for bootstraping some common features for an expressjs application.
+							Includes: livecheck, logging, authentication, and swagger
+						</p>
+						<small>https://mcpstash.cimpress.net/projects/RIGL/repos/belt/browse</small>
+					</section>
+					<section>
+						Iteratee shorthand, null checking, works on arrays and objects
+						<pre><code style="max-height:100%" class="hljs js" data-trim>
+					let a = [{id:1}, {id:2}, {id:3}, {} ];
+					_.map(a, 'id');
+					</code></pre>
+						<small>Compare to:</small>
+						<pre><code style="max-height:100%" class="hljs js" data-trim>
+					let a = [{id:1}, {id:2}, {id:3}, {} ];
+					a.map(o=>(o!=null?o.id:undefined));
+					</code></pre>
 					</section>
 				</section>
 			</div>
