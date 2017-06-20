@@ -52,7 +52,7 @@
 						<li class="fragment highlight-green" data-fragment-index="1">ES2015 / ES2016 / ES2017 Features</li>
 						<li>Promises and Async/Await</li>
 						<li>Transpiling</li>
-						<li>Common Libraries</li>
+						<li>Common Libraries / Patterns</li>
 						<li>Linting / Testing</li>
 					</ol>
 				</section>
@@ -604,10 +604,6 @@ ws.add({ data: 42 });
 					<section>
 						<h3>Promises</h3>
 						<aside class="notes">
-							The const declaration creates a read-only reference to a value. It does not mean the value
-							it holds is immutable, just that the variable identifier cannot be reassigned. For instance,
-							in the case where the content is an object, this means the object's contents
-							(e.g. its parameters) can be altered.
 						</aside>
 					</section>
 
@@ -656,7 +652,7 @@ ws.add({ data: 42 });
 						<li>ES2015 / ES2016 / ES2017 Features</li>
 						<li class="fragment highlight-green" data-fragment-index="1">Promises and Async/Await</li>
 						<li>Transpiling</li>
-						<li>Common Libraries</li>
+						<li>Common Libraries / Patterns</li>
 						<li>Linting / Testing</li>
 					</ol>
 				</section>
@@ -844,7 +840,7 @@ showUserImages('foo')
 						<li>ES2015 / ES2016 / ES2017 Features</li>
 						<li>Promises and Async/Await</li>
 						<li class="fragment highlight-green" data-fragment-index="1">Transpiling</li>
-						<li>Common Libraries</li>
+						<li>Common Libraries / Patterns</li>
 						<li>Linting / Testing</li>
 					</ol>
 				</section>
@@ -945,7 +941,7 @@ import 'babel-polyfill';
 						<li>ES2015 / ES2016 / ES2017 Features</li>
 						<li>Promises and Async/Await</li>
 						<li>Transpiling</li>
-						<li class="fragment highlight-green" data-fragment-index="1">Common Libraries</li>
+						<li class="fragment highlight-green" data-fragment-index="1">Common Libraries / Patterns</li>
 						<li>Linting / Testing</li>
 					</ol>
 				</section>
@@ -1034,17 +1030,122 @@ if (object && object.a && object.a[0] && object.a[0].b ) {
 						</p>
 						<small>https://mcpstash.cimpress.net/projects/RIGL/repos/belt/browse</small>
 					</section>
+				</section>
+				<section>
+					<ol>
+						<li>ES2015 / ES2016 / ES2017 Features</li>
+						<li>Promises and Async/Await</li>
+						<li>Transpiling</li>
+						<li>Common Libraries / Patterns</li>
+						<li class="fragment highlight-green" data-fragment-index="1">Linting / Testing</li>
+					</ol>
+				</section>
+				<section>
 					<section>
-						Iteratee shorthand, null checking, works on arrays and objects
-						<pre><code style="max-height:100%" class="hljs js" data-trim>
-					let a = [{id:1}, {id:2}, {id:3}, {} ];
-					_.map(a, 'id');
+						<h3>Linting</h3>
+						<p>Use Airbnb linting presets</p>
+						<small>http://airbnb.io/javascript/</small>
+					</section>
+					<section>
+					<pre><code style="max-height:100%" class="hljs bash" data-trim>
+npm i -D eslint babel-eslint
+npm i -g install-peerdeps
+install-peerdeps --dev eslint-config-airbnb
 					</code></pre>
-						<small>Compare to:</small>
-						<pre><code style="max-height:100%" class="hljs js" data-trim>
-					let a = [{id:1}, {id:2}, {id:3}, {} ];
-					a.map(o=>(o!=null?o.id:undefined));
+						<pre><code style="max-height:100%" class="hljs json" data-trim>
+//.eslintrc
+{
+    "extends": "airbnb/base",
+    "parser": "babel-eslint",
+    "env": {
+        "node": true
+    },
+    "settings": {
+        "import/parser": "babel-eslint"
+    },
+    "plugins": [
+        "import"
+    ]
+}
 					</code></pre>
+						<small>Add package.json script</small>
+						<pre><code style="max-height:100%" class="hljs json" data-trim>
+ "lint": ./node_modules/.bin/eslint src/
+					</code></pre>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h3>Testing</h3>
+						<p>Mocha/Chai/Sinon</p>
+					</section>
+					<section>
+						<h3>Mocha</h3>
+						<small>https://mochajs.org/</small>
+					</section>
+					<section>
+						<pre><code style="max-height:100%" class="hljs js" data-trim>
+var assert = require('assert');
+describe('Array', function() {
+  describe('#indexOf()', function() {
+    it('should return -1 when the value is not present', () => {
+      assert.equal(-1, [1,2,3].indexOf(4));
+    });
+  });
+});
+					</code></pre>
+					<pre><code style="max-height:100%" class="hljs bash" data-trim>
+  Array
+    #indexOf()
+      ✓ should return -1 when the value is not present
+
+
+  1 passing (9ms)
+					</code></pre>
+					</section>
+					<section>
+						<h3>Chai</h3>
+						<small>http://chaijs.com/</small>
+					</section>
+					<section>
+					<pre><code style="max-height:100%" class="hljs js" data-trim>
+chai.should();
+
+foo.should.be.a('string');
+foo.should.equal('bar');
+foo.should.have.lengthOf(3);
+tea.should.have.property('flavors')
+  .with.lengthOf(3);
+					</code></pre>
+					<pre><code style="max-height:100%" class="hljs js" data-trim>
+var expect = chai.expect;
+
+expect(foo).to.be.a('string');
+expect(foo).to.equal('bar');
+expect(foo).to.have.lengthOf(3);
+expect(tea).to.have.property('flavors')
+  .with.lengthOf(3);
+					</code></pre>
+					<pre><code style="max-height:100%" class="hljs js" data-trim>
+var assert = chai.assert;
+
+assert.typeOf(foo, 'string');
+assert.equal(foo, 'bar');
+assert.lengthOf(foo, 3)
+assert.property(tea, 'flavors');
+assert.lengthOf(tea.flavors, 3);
+					</code></pre>
+					</section>
+					<section>
+						<h3>Sinon</h3>
+						<small>http://sinonjs.org/</small>
+					</section>
+					<section>
+						<ul>
+							<li><b>Spies</b>: a function that records arguments, return value, the value of this and exception thrown (if any) for all its calls.</li>
+							<li><b>Stubs</b>: functions (spies) with pre-programmed behavior.</li>
+							<li><b>Mocks</b>: fake methods (like spies) with pre-programmed behavior (like stubs) as well as pre-programmed expectations.</li>
+						</ul>
 					</section>
 				</section>
 			</div>
